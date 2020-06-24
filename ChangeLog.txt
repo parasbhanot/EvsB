@@ -1,0 +1,30 @@
+
+Image name -> m1s2o2r9
+hash:c80c4bd2a699770a49c247c4a5e58276
+Dated:28Nov2019
+
+Tested by @Sunil and @Mandeep
+
+Changes : 
+
+-Network manager
+-Modem manager
++tcpdump
++rsync
++-updated cman.sh-v10
++timezone(india)
++pyScan.py
+-quectel-ppp
+-pppService
++log(folder) in "/home"
++-updated fwd_default containing V200_m7 (according to Evdc app) 
++-updated charger.db  (according to Evdc app) 
++line
++lslogins
++-updated syslog-ng.conf (according to Evdc app) 
++-updated logrotate.conf (according to Evdc app)
++-default ip 10.42.0.26
++usbutils
++diffutils
++findutils
++tree
