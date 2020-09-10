@@ -2,7 +2,7 @@
 
 <<NOTE1
 
-In pc ppp=eth and eth=wifi [Version v10.O]
+In pc ppp=eth and eth=wifi [Version v11.O]
 
 NOTE1
 
@@ -70,16 +70,23 @@ turnon_pppd () {
 
 on_off_modem_pulse () {
 
- if [[ ${machine} == "pc" ]]
- then
-        echo "I am on pc and hence cannot pulse modem"
-  else
-        echo "Pull modem power pin high"
-        echo 1 > /sys/class/gpio/PD12/value
-        sleep 1s
-        echo "Pull modem power pin low"
-        echo 0 > /sys/class/gpio/PD12/value
-  fi
+ 
+	 mode=$(python /root/check.py)
+
+           if [ "$mode" = "Err" ]
+           then
+                echo "Since gsm is off , hence turing it on using pulse"
+
+
+                echo "Pull modem power pin high"
+                echo 1 > /sys/class/gpio/PD12/value
+                sleep 1s
+                echo "Pull modem power pin low"
+                echo 0 > /sys/class/gpio/PD12/value
+
+        else
+           echo "gsm is already on and hence doing nothing"
+	fi
 
 }
 
@@ -310,7 +317,7 @@ try_and_recover () {
 
 main () {
 
-    echo "Launching Cman version v10.O"
+    echo "Launching Cman version v12.O"
 
     initialize_modem
     echo "turning on modem"
@@ -326,13 +333,28 @@ main () {
     do
     	ping_state=$(check_ping)
 
+
     	if [[ "$ping_state" -eq 0 ]]
     	then
-        	echo "ping passed in normal mode"
-        	TRY_COUNT=0
+
+		echo "ppp ping passed and hence checking normal ping"
+
+                ping -s 10 -c 20 -w 60  "$pip" >/dev/null 2>&1
+                pret=$?
+
+	        if [[ "$pret" -eq 0 ]]
+		then
+
+        	   echo "normal ping passed"
+        	   TRY_COUNT=0
+
+	        else
+			echo "normal ping failed hence setting priority"
+                        route add default dev ppp0
+	        fi
         	
     	else
-        	echo "ping failed in normal mode"
+        	echo "ppp ping failed "
         	
             ((TRY_COUNT++))
             
